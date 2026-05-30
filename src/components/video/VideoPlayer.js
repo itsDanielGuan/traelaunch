@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const VIDEO_FADE_DURATION_MS = 420;
+
 function VideoPlayerInner({
   src,
   poster,
@@ -21,9 +23,12 @@ function VideoPlayerInner({
   const videoRef = useRef(null);
   const didEndRef = useRef(false);
   const playRetryTimerRef = useRef(null);
+  const sourceSwapTimerRef = useRef(null);
 
+  const [displaySrc, setDisplaySrc] = useState(src);
   const [isReady, setIsReady] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
 
   const fireEnded = useCallback(
     (reason) => {
@@ -33,6 +38,37 @@ function VideoPlayerInner({
     },
     [onEnded],
   );
+
+  useEffect(() => {
+    return () => {
+      if (sourceSwapTimerRef.current) {
+        window.clearTimeout(sourceSwapTimerRef.current);
+        sourceSwapTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (src === displaySrc) return;
+
+    didEndRef.current = true;
+    setIsVideoVisible(false);
+
+    if (sourceSwapTimerRef.current) {
+      window.clearTimeout(sourceSwapTimerRef.current);
+    }
+
+    sourceSwapTimerRef.current = window.setTimeout(() => {
+      setDisplaySrc(src);
+      sourceSwapTimerRef.current = null;
+    }, VIDEO_FADE_DURATION_MS);
+  }, [displaySrc, src]);
+
+  useEffect(() => {
+    didEndRef.current = false;
+    setIsReady(false);
+    setHasError(false);
+  }, [displaySrc]);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -62,6 +98,7 @@ function VideoPlayerInner({
 
     const onCanPlay = () => {
       setIsReady(true);
+      setIsVideoVisible(true);
       attemptAutoPlay();
     };
     const onError = () => setHasError(true);
@@ -82,14 +119,17 @@ function VideoPlayerInner({
       el.removeEventListener("error", onError);
       el.removeEventListener("ended", onEndedEvent);
     };
-  }, [autoPlay, fireEnded, muted, src]);
+  }, [autoPlay, displaySrc, fireEnded, muted]);
 
   return (
     <div className={`relative overflow-hidden bg-black ${className}`}>
       <video
         ref={videoRef}
-        className={`h-full w-full ${videoClassName}`}
-        src={src}
+        className={`h-full w-full transition-opacity ease-in-out ${videoClassName} ${
+          isVideoVisible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ transitionDuration: `${VIDEO_FADE_DURATION_MS}ms` }}
+        src={displaySrc}
         poster={poster}
         autoPlay={autoPlay}
         muted={muted}
@@ -124,6 +164,5 @@ export default function VideoPlayer({
   onSkip: _onSkip,
   ...props
 }) {
-  const key = `${props.src ?? ""}`;
-  return <VideoPlayerInner key={key} {...props} />;
+  return <VideoPlayerInner {...props} />;
 }

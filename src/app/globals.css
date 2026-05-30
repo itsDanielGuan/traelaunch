@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Old London";
-  src: url("/fonts/OldLondon.ttf") format("truetype");
-  font-display: swap;
-}
-
 :root {
   --background: #05060a;
   --foreground: #eef3ff;
@@ -18,14 +12,13 @@
   --sc-stone: #11151d;
   --sc-shadow: rgba(0, 0, 0, 0.62);
   --sc-panel: color-mix(in oklab, var(--sc-stone) 86%, transparent);
-  --font-old-london: "Old London";
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-eternalo);
+  --font-mono: var(--font-eternalo);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -145,7 +138,7 @@ body {
 }
 
 .sc-medieval {
-  font-family: var(--font-old-london), "Times New Roman", serif;
+  font-family: var(--font-sans), "Times New Roman", serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

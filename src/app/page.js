@@ -90,17 +90,28 @@ export default function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,6,9,0.18),rgba(4,6,9,0.5)_58%,rgba(2,3,5,0.84)_100%)]" />
       </div>
 
-      <main className="relative z-10 flex min-h-screen items-end justify-center px-6 py-12 sm:py-16">
+      <main className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12 sm:py-16">
         {!journeyStarting ? (
-          <button
-            type="button"
-            className="sc-hero-cta min-w-[220px] text-white/95 sm:min-w-[260px]"
-            onClick={handleBeginJourney}
-          >
-            <span className="sc-medieval sc-metal-text text-2xl sm:text-[2rem]">
-              Begin Journey
-            </span>
-          </button>
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center text-center">
+            <div className="px-6 py-7 sm:px-10 sm:py-10">
+              <div className="sc-kicker text-[11px] text-white/58 sm:text-xs">
+                Interactive Video Experience
+              </div>
+              <h1 className="sc-medieval sc-metal-text mt-4 text-4xl leading-[0.95] sm:text-6xl lg:text-[5.5rem]">
+                SAINT CIRCUIT:
+                <span className="mt-2 block">PILGRIMAGE PROTOCOL</span>
+              </h1>
+            </div>
+            <button
+              type="button"
+              className="sc-hero-cta mt-8 min-w-[220px] text-white/95 sm:min-w-[260px]"
+              onClick={handleBeginJourney}
+            >
+              <span className="sc-medieval sc-metal-text text-2xl sm:text-[2rem]">
+                Begin Journey
+              </span>
+            </button>
+          </div>
         ) : (
           <div className="mx-auto mb-8 w-full max-w-3xl text-center">
             <div className="sc-overlay px-6 py-6 sm:px-8 sm:py-8">
