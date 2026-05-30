@@ -17,6 +17,15 @@ import {
 import { VideoPlayer } from "@/components/video";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+const TRANSITION_TIMINGS = {
+  midpointHoldMs: 1350,
+  revealAfterCanPlayMs: 330,
+  introFadeReleaseMs: 675,
+  overlayFadeMs: 1050,
+  copyFadeMs: 750,
+  introFadeMs: 1800,
+};
+
 function readVideoMetrics(event) {
   const media = event?.currentTarget;
 
@@ -95,6 +104,7 @@ function ExperienceInner() {
   const [progress, setProgress] = useState({ current: 0, duration: 0 });
   const [endingReady, setEndingReady] = useState(false);
   const [decisionOverlayKey, setDecisionOverlayKey] = useState(null);
+  const [skipRequestId, setSkipRequestId] = useState(0);
   const [transitionState, setTransitionState] = useState({
     active: false,
     text: "",
@@ -177,6 +187,9 @@ function ExperienceInner() {
     showVideo && progress.duration > 0
       ? Math.min(progress.current / progress.duration, 1)
       : 0;
+  const isVideoNearEnd = progress.duration > 0 && progress.current >= progress.duration - 0.12;
+  const showSkipControl =
+    showVideo && !decisionOverlayKey && !transitionState.active && !introFadeActive && !isVideoNearEnd;
 
   const stageLabel = decisionOverlayKey
     ? getStageLabel(nextStageAfterVideo(state.currentStage, state.choices) ?? state.currentStage)
@@ -197,7 +210,7 @@ function ExperienceInner() {
           ...current,
           waitingForNextVideo: true,
         }));
-      }, 900);
+      }, TRANSITION_TIMINGS.midpointHoldMs);
     },
     [clearTransitionTimers, queueTransitionTimeout],
   );
@@ -247,6 +260,38 @@ function ExperienceInner() {
     [actions, beginBlackTransition, decisionOverlayKey, dispatch],
   );
 
+  const requestSkip = useCallback(() => {
+    if (!showSkipControl) return;
+    setSkipRequestId((current) => current + 1);
+  }, [showSkipControl]);
+
+  useEffect(() => {
+    if (!showSkipControl) return;
+
+    const handleKeyDown = (event) => {
+      if (event.defaultPrevented || event.key.toLowerCase() !== "s") return;
+
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target instanceof HTMLInputElement ||
+          target instanceof HTMLTextAreaElement ||
+          target instanceof HTMLSelectElement)
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      setSkipRequestId((current) => current + 1);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showSkipControl]);
+
   return (
     <div className="sc-screen relative flex min-h-screen w-full items-stretch justify-stretch bg-black text-white">
       {showVideo ? (
@@ -256,9 +301,7 @@ function ExperienceInner() {
             className="h-full w-full"
             videoClassName="h-full w-full object-cover"
             muted={false}
-            skipAfterSeconds={
-              state.currentStage === STAGES.ENDING ? Number.POSITIVE_INFINITY : 0
-            }
+            skipRequestId={skipRequestId}
             onLoadStart={() => {
               setProgress({ current: 0, duration: 0 });
               setDecisionOverlayKey(null);
@@ -271,7 +314,7 @@ function ExperienceInner() {
               if (state.currentStage === STAGES.PROLOGUE && introFadeActive) {
                 queueTransitionTimeout(() => {
                   setIntroFadeActive(false);
-                }, 450);
+                }, TRANSITION_TIMINGS.introFadeReleaseMs);
               }
 
               if (!transitionState.waitingForNextVideo) return;
@@ -282,7 +325,7 @@ function ExperienceInner() {
                   text: "",
                   waitingForNextVideo: false,
                 });
-              }, 220);
+              }, TRANSITION_TIMINGS.revealAfterCanPlayMs);
             }}
             onEnded={handleVideoEnded}
             onLoadedMetadata={(e) => {
@@ -310,6 +353,13 @@ function ExperienceInner() {
             <div className="sc-kicker text-[10px]">Saint Circuit</div>
             <div className="mt-1 sc-title text-xs font-semibold">{stageLabel}</div>
           </div>
+          {state.currentStage === STAGES.ENDING ? (
+            <div className="ml-auto max-w-sm text-right">
+              <div className="sc-kicker text-[10px] text-white/62">
+                SAINT CIRCUIT:PILGRIMAGE PROTOCOL
+              </div>
+            </div>
+          ) : null}
         </header>
 
         <div className="relative flex flex-1 px-5 pb-8 pt-4 sm:px-8 sm:pb-10">
@@ -511,31 +561,52 @@ function ExperienceInner() {
         </div>
       </div>
 
+      {showSkipControl ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-end p-5 sm:p-8">
+          <button
+            className="pointer-events-auto inline-flex items-center gap-3 rounded-full border border-white/16 bg-black/62 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/86 backdrop-blur-sm transition hover:border-white/32 hover:bg-black/78"
+            type="button"
+            onClick={requestSkip}
+          >
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-[10px] font-semibold text-white/52">
+              S
+            </span>
+            <span>Skip Cutscene</span>
+          </button>
+        </div>
+      ) : null}
+
       <div
-        className={`pointer-events-none absolute inset-0 z-30 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
-          transitionState.active ? "opacity-100" : "opacity-0"
+        className={`pointer-events-none absolute inset-0 z-30 flex items-center justify-center transform-gpu transition-[opacity,transform,filter] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          transitionState.active ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-[1.018] blur-sm"
         }`}
+        style={{ transitionDuration: `${TRANSITION_TIMINGS.overlayFadeMs}ms` }}
       >
         {transitionState.active ? (
           <>
-            <LoopingLoadingVideo className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-black/40" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.24)_46%,rgba(0,0,0,0.68)_100%)]" />
+            <LoopingLoadingVideo className="absolute inset-0 h-full w-full scale-[1.03] object-cover saturate-[0.88]" />
+            <div className="absolute inset-0 bg-black/52 transition-opacity duration-700" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,rgba(0,0,0,0.18)_34%,rgba(0,0,0,0.76)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.66)_0%,rgba(0,0,0,0.28)_22%,rgba(0,0,0,0.52)_58%,rgba(0,0,0,0.82)_100%)]" />
           </>
         ) : null}
         <div
-          className={`relative z-10 px-8 text-center text-sm uppercase tracking-[0.22em] text-white/86 transition-opacity duration-500 ${
-            transitionState.active && transitionState.text ? "opacity-100" : "opacity-0"
+          className={`relative z-10 px-8 text-center text-sm uppercase tracking-[0.22em] text-white/86 transform-gpu transition-[opacity,transform,filter] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            transitionState.active && transitionState.text
+              ? "opacity-100 translate-y-0 blur-0"
+              : "opacity-0 translate-y-2 blur-[2px]"
           }`}
+          style={{ transitionDuration: `${TRANSITION_TIMINGS.copyFadeMs}ms` }}
         >
           {transitionState.text}
         </div>
       </div>
 
       <div
-        className={`pointer-events-none absolute inset-0 z-40 bg-black transition-opacity duration-1200 ease-out ${
-          introFadeActive ? "opacity-100" : "opacity-0"
+        className={`pointer-events-none absolute inset-0 z-40 bg-black transition-[opacity,filter] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          introFadeActive ? "opacity-100 blur-0" : "opacity-0 blur-sm"
         }`}
+        style={{ transitionDuration: `${TRANSITION_TIMINGS.introFadeMs}ms` }}
       />
     </div>
   );

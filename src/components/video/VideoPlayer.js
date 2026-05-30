@@ -10,7 +10,7 @@ function VideoPlayerInner({
   className = "",
   videoClassName = "",
   skipAfterSeconds = 0,
-  skipButtonClassName = "",
+  skipRequestId = 0,
   onSkip,
   autoPlay = true,
   muted = true,
@@ -22,6 +22,7 @@ function VideoPlayerInner({
 }) {
   const videoRef = useRef(null);
   const didEndRef = useRef(false);
+  const handledSkipRequestRef = useRef(0);
   const playRetryTimerRef = useRef(null);
   const sourceSwapTimerRef = useRef(null);
 
@@ -74,7 +75,7 @@ function VideoPlayerInner({
 
   const handleSkip = useCallback(() => {
     const el = videoRef.current;
-    if (!el || didEndRef.current) return;
+    if (!el || didEndRef.current || !isReady || hasError || loop || !canSkip) return;
 
     const duration = Number.isFinite(el.duration) ? el.duration : 0;
 
@@ -86,7 +87,13 @@ function VideoPlayerInner({
 
     onSkip?.();
     fireEnded("skipped");
-  }, [fireEnded, onSkip]);
+  }, [canSkip, fireEnded, hasError, isReady, loop, onSkip]);
+
+  useEffect(() => {
+    if (!skipRequestId || handledSkipRequestRef.current === skipRequestId) return;
+    handledSkipRequestRef.current = skipRequestId;
+    handleSkip();
+  }, [handleSkip, skipRequestId]);
 
   useEffect(() => {
     if (skipAfterSeconds <= 0) return;
@@ -193,17 +200,6 @@ function VideoPlayerInner({
         </div>
       ) : null}
 
-      {!loop && isReady && !hasError && canSkip ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-end p-4 sm:p-6">
-          <button
-            className={`pointer-events-auto rounded-full border border-white/16 bg-black/56 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/88 backdrop-blur-sm transition hover:border-white/34 hover:bg-black/72 ${skipButtonClassName}`}
-            type="button"
-            onClick={handleSkip}
-          >
-            Skip Cutscene
-          </button>
-        </div>
-      ) : null}
     </div>
   );
 }

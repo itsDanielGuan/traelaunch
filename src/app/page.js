@@ -19,6 +19,8 @@ function LoopingScreenVideo({ src, className = "", videoRef }) {
     const element = videoRef?.current;
     if (!(element instanceof HTMLVideoElement)) return;
 
+    element.defaultMuted = false;
+    element.muted = false;
     const playPromise = element.play();
 
     if (playPromise?.catch) {
@@ -37,7 +39,7 @@ function LoopingScreenVideo({ src, className = "", videoRef }) {
       src={src}
       autoPlay
       loop
-      muted
+      muted={false}
       playsInline
       preload="auto"
     />
@@ -101,6 +103,9 @@ export default function Home() {
                 SAINT CIRCUIT:
                 <span className="mt-2 block">PILGRIMAGE PROTOCOL</span>
               </h1>
+              <p className="mt-4 text-sm uppercase tracking-[0.35em] text-white/72 sm:text-base">
+                Launching July 2026
+              </p>
             </div>
             <button
               type="button"
