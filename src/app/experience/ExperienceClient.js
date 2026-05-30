@@ -24,6 +24,9 @@ const TRANSITION_TIMINGS = {
   overlayFadeMs: 1050,
   copyFadeMs: 750,
   introFadeMs: 1800,
+  endingReplayFadeMs: 1200,
+  endingReplayBlackHoldMs: 3000,
+  endingReplayRevealDelayMs: 120,
 };
 
 function readVideoMetrics(event) {
@@ -111,6 +114,11 @@ function ExperienceInner() {
     waitingForNextVideo: false,
   });
   const [introFadeActive, setIntroFadeActive] = useState(state.currentStage === STAGES.PROLOGUE);
+  const [endingReplayState, setEndingReplayState] = useState({
+    active: false,
+    waitingForReplayVideo: false,
+  });
+  const [videoReplayNonce, setVideoReplayNonce] = useState(0);
 
   const transitionTimersRef = useRef([]);
 
@@ -130,6 +138,15 @@ function ExperienceInner() {
       clearTransitionTimers();
     };
   }, [clearTransitionTimers]);
+
+  useEffect(() => {
+    if (state.currentStage === STAGES.ENDING || state.currentStage === STAGES.PRODUCT) return;
+
+    setEndingReplayState({
+      active: false,
+      waitingForReplayVideo: false,
+    });
+  }, [state.currentStage]);
 
   useEffect(() => {
     const { documentElement, body } = document;
@@ -203,7 +220,12 @@ function ExperienceInner() {
       : 0;
   const isVideoNearEnd = progress.duration > 0 && progress.current >= progress.duration - 0.12;
   const showSkipControl =
-    showVideo && !decisionOverlayKey && !transitionState.active && !introFadeActive && !isVideoNearEnd;
+    showVideo &&
+    !decisionOverlayKey &&
+    !transitionState.active &&
+    !introFadeActive &&
+    !endingReplayState.active &&
+    !isVideoNearEnd;
 
   const stageLabel = decisionOverlayKey
     ? getStageLabel(nextStageAfterVideo(state.currentStage, state.choices) ?? state.currentStage)
@@ -235,9 +257,30 @@ function ExperienceInner() {
     glow: "var(--sc-red)",
   };
 
+  const beginEndingReplayTransition = useCallback(() => {
+    clearTransitionTimers();
+    setEndingReplayState({
+      active: true,
+      waitingForReplayVideo: false,
+    });
+
+    queueTransitionTimeout(() => {
+      setProgress({ current: 0, duration: 0 });
+      setVideoReplayNonce((current) => current + 1);
+      setEndingReplayState({
+        active: true,
+        waitingForReplayVideo: true,
+      });
+    }, TRANSITION_TIMINGS.endingReplayFadeMs + TRANSITION_TIMINGS.endingReplayBlackHoldMs);
+  }, [clearTransitionTimers, queueTransitionTimeout]);
+
   const handleVideoEnded = useCallback(() => {
-    if (state.currentStage === STAGES.ENDING) {
-      setEndingReady(true);
+    if (state.currentStage === STAGES.ENDING || state.currentStage === STAGES.PRODUCT) {
+      if (state.currentStage === STAGES.ENDING) {
+        setEndingReady(true);
+      }
+
+      beginEndingReplayTransition();
       return;
     }
 
@@ -258,7 +301,7 @@ function ExperienceInner() {
     }
 
     dispatch(actions.videoEnded());
-  }, [actions, beginBlackTransition, dispatch, state.choices, state.currentStage]);
+  }, [actions, beginBlackTransition, beginEndingReplayTransition, dispatch, state.choices, state.currentStage]);
 
   const handleDecisionSelect = useCallback(
     (option) => {
@@ -311,6 +354,7 @@ function ExperienceInner() {
       {showVideo ? (
         <div className="absolute inset-0">
           <VideoPlayer
+            key={`${state.currentStage}-${videoSrc}-${videoReplayNonce}`}
             src={videoSrc}
             className="h-full w-full"
             videoClassName="h-full w-full object-cover"
@@ -329,6 +373,15 @@ function ExperienceInner() {
                 queueTransitionTimeout(() => {
                   setIntroFadeActive(false);
                 }, TRANSITION_TIMINGS.introFadeReleaseMs);
+              }
+
+              if (endingReplayState.waitingForReplayVideo) {
+                queueTransitionTimeout(() => {
+                  setEndingReplayState({
+                    active: false,
+                    waitingForReplayVideo: false,
+                  });
+                }, TRANSITION_TIMINGS.endingReplayRevealDelayMs);
               }
 
               if (!transitionState.waitingForNextVideo) return;
@@ -356,6 +409,12 @@ function ExperienceInner() {
           />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.04),transparent_26%)]" />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.08)_30%,rgba(0,0,0,0.58)_100%)]" />
+          <div
+            className={`pointer-events-none absolute inset-0 bg-black transition-opacity ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              endingReplayState.active ? "opacity-100" : "opacity-0"
+            }`}
+            style={{ transitionDuration: `${TRANSITION_TIMINGS.endingReplayFadeMs}ms` }}
+          />
         </div>
       ) : (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(77,186,210,0.14),transparent_24%),radial-gradient(circle_at_20%_60%,rgba(198,23,47,0.16),transparent_28%),linear-gradient(180deg,#071019_0%,#06080c_48%,#030406_100%)]" />

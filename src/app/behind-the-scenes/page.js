@@ -2,7 +2,8 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Behind the Scenes | SAINT CIRCUIT",
-  description: "PixVerse + TRAE workflow notes for Saint Circuit: Pilgrimage Protocol.",
+  description:
+    "PixVerse + Trae Solo workflow notes for Saint Circuit: Pilgrimage Protocol.",
 };
 
 function Section({ id, title, description, children }) {
@@ -53,8 +54,9 @@ function List({ items }) {
 
 function InlineNav() {
   const items = [
+    { href: "#pipeline", label: "Pipeline" },
     { href: "#pixverse", label: "PixVerse" },
-    { href: "#trae", label: "TRAE" },
+    { href: "#trae", label: "Trae Solo" },
     { href: "#shots", label: "Shots" },
     { href: "#prompts", label: "Prompts" },
     { href: "#mapping", label: "Decision Mapping" },
@@ -88,9 +90,11 @@ export default function BehindTheScenesPage() {
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-white/75">
               How Saint Circuit was produced as a modular library of clips, then
-              wired into an interactive decision flow. PixVerse handles the
-              cinematic generation; TRAE accelerates planning, prompt iteration,
-              and implementation.
+              wired into an interactive decision flow. PixVerse was used as the
+              visual production engine and Trae Solo was used as the creative,
+              systems, and implementation partner, so every major stage moved
+              through both tools instead of treating either one as a single-use
+              add-on.
             </p>
           </div>
           <div className="lg:col-span-4 lg:flex lg:justify-end">
@@ -144,54 +148,190 @@ export default function BehindTheScenesPage() {
 
         <div className="mt-14 grid gap-16">
           <Section
-            id="pixverse"
-            title="PixVerse Workflow"
-            description="Treat PixVerse as a cinematic production engine: generate in short shots, then assemble into decision-driven segments."
+            id="pipeline"
+            title="End-to-End Pipeline"
+            description="The project was built as one continuous loop between narrative design, asset generation, app implementation, and final documentation. At each stage, Trae Solo shaped structure and PixVerse turned that structure into cinematic output."
           >
             <div className="grid gap-6 lg:grid-cols-2">
-              <Card title="Previs → Shot List" eyebrow="Step 1">
-                Define the 22 deliverables (prologue, 12 decision consequences,
-                4 endings, 4 product reveals, landing loop), then break each into
-                short shots for controllability.
+              <Card title="1. Brief Consolidation + Scope Lock" eyebrow="Trae Solo + PixVerse">
+                Trae Solo helped consolidate the hackathon brief into a practical
+                production plan: required screens, branching logic, ending
+                system, product reveal structure, and PixVerse-only constraints.
+                That planning made it possible to define exactly which clips
+                needed to be generated in PixVerse and how they would connect in
+                the experience.
               </Card>
-              <Card title="Generate Short Shots" eyebrow="Step 2">
-                Prefer 6–8 second shots with consistent style constraints
-                (hyperreal, rain, wet reflections, fog, anamorphic language) to
-                keep motion readable and iteration fast.
+              <Card title="2. Worldbuilding + Visual System" eyebrow="Trae Solo + PixVerse">
+                Trae Solo translated loose references into a unified visual
+                language: cyber-gothic cathedral, rain, sacred machine horror,
+                halo logic, material palette, and camera behavior. PixVerse then
+                used that locked visual system to produce consistent frames,
+                motion, and atmosphere across landing, prologue, consequences,
+                endings, and product commercials.
               </Card>
-              <Card title="Extend / Modify / Transition" eyebrow="Step 3">
-                When a shot needs continuity, use PixVerse’s video modification
-                tools for trims, extensions, and transitions instead of jumping
-                across unrelated outputs.
+              <Card title="3. Branching Narrative Design" eyebrow="Trae Solo">
+                Trae Solo converted the cinematic concept into four decisions,
+                three options per decision, hidden score vectors, the Open the
+                Gates conditional rule, and deterministic ending resolution. The
+                same narrative map became the blueprint for both clip production
+                and the in-app state machine.
               </Card>
-              <Card title="Assemble Final Clips" eyebrow="Step 4">
-                Stitch shots into the final 60s prologue, 30s consequences, 30s
-                endings, and 10–15s product reveals so the experience can swap
-                segments instantly per user decision.
+              <Card title="4. Prompt Bible + Shot Plan" eyebrow="Trae Solo + PixVerse">
+                Trae Solo organized prompts into reusable systems: base style,
+                negative prompt, continuity anchors, shot objectives, and
+                product-specific variations. PixVerse then used those prompt
+                packages to generate short, controllable units that could be
+                assembled into the final modular library.
+              </Card>
+              <Card title="5. Generation + Continuity Passes" eyebrow="PixVerse">
+                PixVerse handled still references, short cinematic shots,
+                consequence clips, ending clips, and hardware reveal clips.
+                Where continuity or pacing drifted, PixVerse modification,
+                extension, and transition features were used to repair the cut
+                without abandoning the established look.
+              </Card>
+              <Card title="6. Asset Integration + UX Build" eyebrow="Trae Solo">
+                Trae Solo was used to wire clip paths into the application,
+                structure the experience route, build the codex and
+                behind-the-scenes pages, connect decisions to playback, and keep
+                the interactive flow aligned with the story logic instead of
+                becoming a disconnected video gallery.
+              </Card>
+              <Card title="7. Debugging + Iteration" eyebrow="Trae Solo + PixVerse">
+                Trae Solo accelerated UI debugging, playback fixes, copy
+                rewrites, and state-flow corrections. PixVerse supported the
+                parallel visual iteration loop by enabling clip replacements,
+                refinements, and alternate takes whenever a narrative beat or
+                visual continuity issue showed up during implementation.
+              </Card>
+              <Card title="8. Submission Proof + Write-Up" eyebrow="Trae Solo + PixVerse">
+                PixVerse outputs were tracked as the source for final cinematic
+                assets, including the model and prompt metadata required by the
+                brief. Trae Solo then consolidated those production steps into a
+                readable behind-the-scenes narrative and final write-up language
+                that explains how the project used both tools across the full
+                pipeline.
+              </Card>
+            </div>
+          </Section>
+
+          <Section
+            id="pixverse"
+            title="PixVerse Workflow"
+            description="PixVerse was not used for a single hero clip. It was used repeatedly across previs, style lock, consequence generation, continuity repair, ending production, and product cinematics."
+          >
+            <div className="grid gap-6 lg:grid-cols-3">
+              <Card title="Reference Stills + Mood Lock" eyebrow="Use case 1">
+                PixVerse was used to generate anchor imagery for the ruined
+                plaza, cathedral exterior, archangel reveal, and sword altar so
+                the team could validate tone, silhouette, palette, and sacred
+                machine detail before committing to final video generations.
+              </Card>
+              <Card title="Landing Loop Production" eyebrow="Use case 2">
+                PixVerse generated the looping title-screen atmosphere: subtle
+                environmental motion, cathedral glow, fog, rain, reflections,
+                and premium game-menu mood without requiring a full narrative
+                action sequence.
+              </Card>
+              <Card title="Prologue Generation" eyebrow="Use case 3">
+                PixVerse produced the cinematic opening beats that establish the
+                plaza, lone pilgrim, dead angel wreckage, cathedral awakening,
+                and archangel crash. This turns the worldbuilding brief into a
+                premium trailer-like opening that feeds directly into the first
+                choice.
+              </Card>
+              <Card title="Decision Consequence Clips" eyebrow="Use case 4">
+                PixVerse was used to create twelve branching consequence clips,
+                one for every option across the four decisions. Each clip turns
+                a choice into a visible world response, making the experience
+                feel reactive instead of text-driven.
+              </Card>
+              <Card title="Ending Clips" eyebrow="Use case 5">
+                PixVerse generated the four final moral outcomes so each score
+                path resolves with distinct imagery: collapse, apotheosis,
+                corruption spread, or machine mercy. The visuals therefore carry
+                the emotional payoff of the hidden scoring system.
+              </Card>
+              <Card title="Product Reveal Commercials" eyebrow="Use case 6">
+                PixVerse was also used as a product cinematography tool. Each
+                Relicware reveal behaves like a premium hardware spot with altar
+                staging, material glamour shots, rotation, volumetric lighting,
+                and palette inheritance from the unlocked ending.
+              </Card>
+              <Card title="Short-Shot Modularity" eyebrow="Use case 7">
+                Instead of relying on long fragile generations, PixVerse was
+                used to generate short 6-8 second units. That made it easier to
+                preserve motion quality, swap weak shots, and tune pacing while
+                keeping the final clips modular for interactive playback.
+              </Card>
+              <Card title="Continuity Repair" eyebrow="Use case 8">
+                When a sequence needed better alignment in timing, camera logic,
+                or atmosphere, PixVerse extension, modification, and transition
+                workflows kept the cut coherent without resetting the entire
+                sequence from scratch.
+              </Card>
+              <Card title="Compliance + Asset Logging" eyebrow="Use case 9">
+                PixVerse model choice, prompt language, and seed/settings are
+                part of the final deliverable story, not just backstage notes.
+                Logging those details proves the project stayed inside the
+                PixVerse-only requirement while preserving a reusable asset trail.
               </Card>
             </div>
           </Section>
 
           <Section
             id="trae"
-            title="TRAE Workflow"
-            description="Use TRAE as the connective tissue between narrative design, prompt iteration, and implementation."
+            title="Trae Solo Workflow"
+            description="Trae Solo was used as the connective system across concepting, structure, prompt writing, implementation, debugging, and documentation, so the cinematic output could function as a real product instead of a loose sequence of clips."
           >
             <div className="grid gap-6 lg:grid-cols-3">
-              <Card title="Plan the Branching Narrative" eyebrow="Story">
-                Convert the brief into decisions, scoring vectors, and outcomes
-                that read like sacred commands but resolve like a deterministic
-                state machine.
+              <Card title="Brief Decomposition" eyebrow="Use case 1">
+                Trae Solo was used to unpack the brief into screens, clips,
+                routing needs, logic requirements, and ownership boundaries so
+                the project could move from idea to executable scope without
+                losing the cinematic ambition.
               </Card>
-              <Card title="Prompt Refinement Loop" eyebrow="Prompts">
-                Maintain a shared style bible and iterate shot prompts quickly:
-                fix anatomy, lighting, lens language, and continuity before
-                generating entire sequences.
+              <Card title="Narrative System Design" eyebrow="Use case 2">
+                Trae Solo structured the four-decision branching model, score
+                vectors, outcome weights, and product unlock mapping. That work
+                turned the story into a deterministic system that developers
+                could wire directly into the experience.
               </Card>
-              <Card title="Build + Debug the Experience" eyebrow="Code">
-                Scaffold routes and content pages, wire decision data to video
-                assets, and troubleshoot UI/UX issues quickly without derailing
-                the narrative structure.
+              <Card title="Prompt Authoring + Refinement" eyebrow="Use case 3">
+                Trae Solo helped draft the prompt bible, unify the style
+                vocabulary, expand shot descriptions, define negative prompts,
+                and tighten continuity handles. That reduced prompt drift and
+                kept generations aligned with the same world logic.
+              </Card>
+              <Card title="Shot Breakdown Planning" eyebrow="Use case 4">
+                Trae Solo broke long deliverables into manageable shot groups:
+                prologue beats, 4-5-shot consequence clips, ending payoff beats,
+                and 10-15 second product reveals. This made PixVerse generation
+                more controllable and made assembly predictable.
+              </Card>
+              <Card title="Frontend Implementation" eyebrow="Use case 5">
+                Trae Solo was used to scaffold and refine the app experience:
+                landing page, experience route, ending resolution, content
+                screens, navigation, and the connection between state changes
+                and media playback.
+              </Card>
+              <Card title="Video Integration" eyebrow="Use case 6">
+                Trae Solo helped map generated assets to the proper stages,
+                decision branches, endings, and product reveals so the right
+                clip appears at the right narrative moment with minimal manual
+                rework.
+              </Card>
+              <Card title="Debugging + QA" eyebrow="Use case 7">
+                Trae Solo accelerated iteration on timing, playback behavior,
+                route transitions, state resets, and copy polish. It shortened
+                the loop between spotting an issue in the experience and making
+                a targeted fix in code or content.
+              </Card>
+              <Card title="Write-Up Consolidation" eyebrow="Use case 8">
+                Trae Solo was used to consolidate the full production story into
+                the codex, behind-the-scenes page, and final hackathon write-up,
+                making the collaboration between narrative system design and
+                PixVerse generation legible to judges.
               </Card>
             </div>
           </Section>
@@ -256,7 +396,7 @@ export default function BehindTheScenesPage() {
           <Section
             id="prompts"
             title="Prompt Strategy"
-            description="Keep prompts consistent across shots so the cut feels like one trailer, not a collage."
+            description="The prompt system was designed so Trae Solo could standardize intent and PixVerse could execute it repeatedly without the project collapsing into mismatched aesthetics."
           >
             <div className="grid gap-6 lg:grid-cols-3">
               <Card title="Style Bible" eyebrow="Consistency">
@@ -272,6 +412,19 @@ export default function BehindTheScenesPage() {
                 Anchor each shot with recurring tokens: the cracked sword, the
                 hooded silhouette, the cathedral circuitry palette, and the halo
                 color logic that reflects the ending.
+              </Card>
+            </div>
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              <Card title="How Trae Solo Helped the Prompt Loop" eyebrow="Workflow">
+                Trae Solo consolidated references into reusable prompt language,
+                suggested clearer cinematic wording, and kept the project from
+                rewriting the visual brief from zero every time a new shot type
+                was needed.
+              </Card>
+              <Card title="How PixVerse Benefited From It" eyebrow="Workflow">
+                Because the prompt system was stable, PixVerse generations could
+                stay focused on scene variation and motion quality rather than
+                re-solving identity, environment, or camera logic on every run.
               </Card>
             </div>
           </Section>
@@ -308,7 +461,7 @@ export default function BehindTheScenesPage() {
           <Section
             id="efficiency"
             title="Efficiency Gains"
-            description="Where the pipeline saves time and keeps the experience cohesive."
+            description="The main gain came from using Trae Solo for structure and iteration while using PixVerse for cinematic execution, creating a feedback loop instead of two disconnected workflows."
           >
             <div className="grid gap-6 lg:grid-cols-3">
               <Card title="Short shots reduce rework" eyebrow="Production">
@@ -322,6 +475,19 @@ export default function BehindTheScenesPage() {
               <Card title="Decision mapping is deterministic" eyebrow="Engineering">
                 Clear scoring and conditional rules turn “interactive trailer”
                 into a debuggable system: choices → clip → ending → product.
+              </Card>
+            </div>
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              <Card title="Trae Solo compressed planning time" eyebrow="Creative ops">
+                Narrative structure, prompt systems, implementation tasks, and
+                copy consolidation happened faster because Trae Solo could move
+                between design reasoning and code reasoning without forcing the
+                team to switch tools for every small decision.
+              </Card>
+              <Card title="PixVerse preserved visual ambition" eyebrow="Production ops">
+                The team could keep a premium cinematic target across every
+                branch because PixVerse handled both atmospheric world shots and
+                product-commercial imagery inside the same visual universe.
               </Card>
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
