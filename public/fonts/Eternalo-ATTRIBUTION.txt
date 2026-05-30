@@ -1,0 +1,5 @@
+Eternalo
+Designer: Heru Utama Putra
+Source: exfont.com
+Downloaded for local self-hosting in this project.
+License note on source page: Free for Personal Use.

@@ -6,32 +6,19 @@ export const MEDIA_PATHS = Object.freeze({
   landingLoop: "/video/loading.mp4",
   prologue: "/video/initialscene.mp4",
   decisions: {
-    route: {
-      nave: "/videos/decision-1/nave.mp4",
-      tower: "/videos/decision-1/tower.mp4",
-      crypt: "/videos/decision-1/crypt.mp4",
+    approach: {
+      kneel: "/video/kneel.mp4",
+      fight: "/video/fight1.mp4",
     },
-    blade: {
-      "prayer-code": "/videos/decision-2/prayer-code.mp4",
-      "dead-fire": "/videos/decision-2/dead-fire.mp4",
-      "human-memory": "/videos/decision-2/human-memory.mp4",
-    },
-    sacrifice: {
-      fear: "/videos/decision-3/fear.mp4",
-      memories: "/videos/decision-3/memories.mp4",
-      obedience: "/videos/decision-3/obedience.mp4",
-    },
-    command: {
-      "sever-core": "/videos/decision-4/sever-core.mp4",
-      "wear-halo": "/videos/decision-4/wear-halo.mp4",
-      "open-gates": "/videos/decision-4/open-gates.mp4",
+    kneelResponse: {
+      "give-up": "/videos/decision-2/give-up.mp4",
+      "sneak-attack": "/videos/decision-2/sneak-attack.mp4",
     },
   },
   endings: {
-    destroyer: "/videos/endings/destroyer.mp4",
-    saint: "/videos/endings/saint.mp4",
-    heretic: "/videos/endings/heretic.mp4",
-    apostle: "/videos/endings/apostle.mp4",
+    fight: null,
+    "kneel-give-up": null,
+    "kneel-sneak-attack": null,
   },
   products: {
     haloframe: {
@@ -57,6 +44,8 @@ const READY_VIDEO_SOURCES = new Set([
   MEDIA_PATHS.loadingLoop,
   MEDIA_PATHS.landingLoop,
   MEDIA_PATHS.prologue,
+  MEDIA_PATHS.decisions.approach.kneel,
+  MEDIA_PATHS.decisions.approach.fight,
 ]);
 
 export function resolveVideoSrc(targetPath) {

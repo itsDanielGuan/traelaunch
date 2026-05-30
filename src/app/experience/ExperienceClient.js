@@ -30,8 +30,8 @@ function readVideoMetrics(event) {
   };
 }
 
-function getUpcomingDecisionKey(stage) {
-  const nextStage = nextStageAfterVideo(stage);
+function getUpcomingDecisionKeyFromChoices(stage, choices) {
+  const nextStage = nextStageAfterVideo(stage, choices);
   return nextStage ? decisionKeyForStage(nextStage) : null;
 }
 
@@ -39,18 +39,12 @@ function getStageLabel(stage) {
   switch (stage) {
     case STAGES.PROLOGUE:
       return "Prologue";
-    case STAGES.DECISION_ROUTE:
+    case STAGES.DECISION_APPROACH:
       return "Decision I";
-    case STAGES.DECISION_BLADE:
+    case STAGES.DECISION_KNEEL_RESPONSE:
       return "Decision II";
-    case STAGES.DECISION_SACRIFICE:
-      return "Decision III";
-    case STAGES.DECISION_COMMAND:
-      return "Decision IV";
-    case STAGES.CONSEQUENCE_ROUTE:
-    case STAGES.CONSEQUENCE_BLADE:
-    case STAGES.CONSEQUENCE_SACRIFICE:
-    case STAGES.CONSEQUENCE_COMMAND:
+    case STAGES.CONSEQUENCE_APPROACH:
+    case STAGES.CONSEQUENCE_KNEEL_RESPONSE:
       return "Consequence";
     case STAGES.ENDING:
       return "Ending";
@@ -132,6 +126,28 @@ function ExperienceInner() {
     return decisionKeyForStage(state.currentStage);
   }, [state.currentStage]);
 
+  const pathSummary = useMemo(() => {
+    const summaryOrder = ["approach", "kneelResponse"];
+
+    return summaryOrder
+      .map((decisionKey) => {
+        const optionId = state.choices?.[decisionKey];
+        if (!optionId) return null;
+
+        const decision = decisionData[decisionKey];
+        const option = decision?.options.find((entry) => entry.id === optionId);
+        if (!decision || !option) return null;
+
+        return {
+          key: decisionKey,
+          title: decisionKey === "approach" ? "Approach" : "Kneel Choice",
+          label: option.label,
+          description: option.description,
+        };
+      })
+      .filter(Boolean);
+  }, [state.choices]);
+
   const selectedOption = useMemo(() => {
     if (!activeConsequenceKey) return null;
 
@@ -155,9 +171,8 @@ function ExperienceInner() {
       ? Math.min(progress.current / progress.duration, 1)
       : 0;
 
-  const choiceEntries = Object.entries(state.scores);
   const stageLabel = decisionOverlayKey
-    ? getStageLabel(nextStageAfterVideo(state.currentStage) ?? state.currentStage)
+    ? getStageLabel(nextStageAfterVideo(state.currentStage, state.choices) ?? state.currentStage)
     : getStageLabel(state.currentStage);
 
   const beginBlackTransition = useCallback(
@@ -180,19 +195,21 @@ function ExperienceInner() {
     [clearTransitionTimers, queueTransitionTimeout],
   );
 
+  const isEndingReady = endingReady || (state.currentStage === STAGES.ENDING && !videoSrc);
+
   const handleVideoEnded = useCallback(() => {
     if (state.currentStage === STAGES.ENDING) {
       setEndingReady(true);
       return;
     }
 
-    const nextDecisionKey = getUpcomingDecisionKey(state.currentStage);
+    const nextDecisionKey = getUpcomingDecisionKeyFromChoices(state.currentStage, state.choices);
     if (nextDecisionKey) {
       setDecisionOverlayKey(nextDecisionKey);
       return;
     }
 
-    if (state.currentStage === STAGES.CONSEQUENCE_COMMAND) {
+    if (state.currentStage === STAGES.CONSEQUENCE_KNEEL_RESPONSE) {
       beginBlackTransition("", () => {
         dispatch(actions.videoEnded());
       });
@@ -200,7 +217,7 @@ function ExperienceInner() {
     }
 
     dispatch(actions.videoEnded());
-  }, [actions, beginBlackTransition, dispatch, state.currentStage]);
+  }, [actions, beginBlackTransition, dispatch, state.choices, state.currentStage]);
 
   const handleDecisionSelect = useCallback(
     (option) => {
@@ -293,10 +310,10 @@ function ExperienceInner() {
 
                 <div className="mx-auto mt-4 flex w-full max-w-5xl flex-col gap-3">
                   {overlayDecision.options.map((option) => {
-                    const isOpenGates =
-                      decisionOverlayKey === "command" &&
-                      option.id === "open-gates";
-                    const btnClass = isOpenGates
+                    const isFightChoice =
+                      decisionOverlayKey === "approach" &&
+                      option.id === "fight";
+                    const btnClass = isFightChoice
                       ? "sc-btn sc-btn-danger"
                       : "sc-btn";
 
@@ -338,7 +355,10 @@ function ExperienceInner() {
                   {selectedOption ? selectedOption.label : "..."}
                 </div>
                 <div className="mt-2 text-sm leading-6 text-white/72">
-                  The next choice appears after the clip finishes.
+                  {state.currentStage === STAGES.CONSEQUENCE_APPROACH &&
+                  selectedOption?.id === "fight"
+                    ? "This branch is scaffolded and ready for the fight clip and later choices."
+                    : "The next step appears after the clip finishes."}
                 </div>
               </div>
             </div>
@@ -356,31 +376,36 @@ function ExperienceInner() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {choiceEntries.map(([key, value]) => (
-                  <div key={key} className="sc-overlay px-4 py-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {pathSummary.map((entry) => (
+                  <div key={entry.key} className="sc-overlay px-4 py-3">
                     <div className="sc-kicker text-[9px] text-white/52">
-                      {key}
+                      {entry.title}
                     </div>
                     <div className="mt-2 text-lg font-semibold text-white">
-                      {value}
+                      {entry.label}
+                    </div>
+                    <div className="mt-2 text-sm leading-6 text-white/68">
+                      {entry.description}
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <button
-                  className="sc-btn sc-btn-primary"
-                  type="button"
-                  onClick={() => {
-                    setEndingReady(false);
-                    dispatch(actions.revealProduct());
-                  }}
-                  disabled={!endingReady}
-                >
-                  Reveal Relicware
-                </button>
+                {product ? (
+                  <button
+                    className="sc-btn sc-btn-primary"
+                    type="button"
+                    onClick={() => {
+                      setEndingReady(false);
+                      dispatch(actions.revealProduct());
+                    }}
+                    disabled={!isEndingReady}
+                  >
+                    Reveal Relicware
+                  </button>
+                ) : null}
                 <button
                   className="sc-btn"
                   type="button"
@@ -394,9 +419,14 @@ function ExperienceInner() {
                 </button>
               </div>
 
-              {!endingReady ? (
+              {!isEndingReady ? (
                 <div className="text-xs text-white/58">
-                  The final frame is holding. The ending reveal will unlock next.
+                  The ending card will unlock once the current clip finishes.
+                </div>
+              ) : null}
+              {isEndingReady && !product ? (
+                <div className="text-xs text-white/58">
+                  Product reveal is waiting for the product assets you will provide.
                 </div>
               ) : null}
             </div>

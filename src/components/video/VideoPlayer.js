@@ -9,9 +9,9 @@ function VideoPlayerInner({
   poster,
   className = "",
   videoClassName = "",
-  skipAfterSeconds: _skipAfterSeconds,
-  skipButtonClassName: _skipButtonClassName,
-  onSkip: _onSkip,
+  skipAfterSeconds = 0,
+  skipButtonClassName = "",
+  onSkip,
   autoPlay = true,
   muted = true,
   loop = false,
@@ -29,6 +29,10 @@ function VideoPlayerInner({
   const [isReady, setIsReady] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const [skipUnlocked, setSkipUnlocked] = useState(false);
+
+  const isSourceSwapping = src !== displaySrc;
+  const canSkip = skipAfterSeconds <= 0 || skipUnlocked;
 
   const fireEnded = useCallback(
     (reason) => {
@@ -52,23 +56,57 @@ function VideoPlayerInner({
     if (src === displaySrc) return;
 
     didEndRef.current = true;
-    setIsVideoVisible(false);
 
     if (sourceSwapTimerRef.current) {
       window.clearTimeout(sourceSwapTimerRef.current);
     }
 
     sourceSwapTimerRef.current = window.setTimeout(() => {
+      didEndRef.current = false;
+      setIsReady(false);
+      setHasError(false);
+      setIsVideoVisible(false);
+      setSkipUnlocked(false);
       setDisplaySrc(src);
       sourceSwapTimerRef.current = null;
     }, VIDEO_FADE_DURATION_MS);
   }, [displaySrc, src]);
 
+  const handleSkip = useCallback(() => {
+    const el = videoRef.current;
+    if (!el || didEndRef.current) return;
+
+    const duration = Number.isFinite(el.duration) ? el.duration : 0;
+
+    if (duration > 0) {
+      const targetTime = Math.max(duration - 0.05, 0);
+      el.pause();
+      el.currentTime = targetTime;
+    }
+
+    onSkip?.();
+    fireEnded("skipped");
+  }, [fireEnded, onSkip]);
+
   useEffect(() => {
-    didEndRef.current = false;
-    setIsReady(false);
-    setHasError(false);
-  }, [displaySrc]);
+    if (skipAfterSeconds <= 0) return;
+
+    const el = videoRef.current;
+    if (!el) return;
+
+    const updateSkipAvailability = () => {
+      if (Number.isFinite(el.currentTime) && el.currentTime >= skipAfterSeconds) {
+        setSkipUnlocked(true);
+      }
+    };
+
+    el.addEventListener("timeupdate", updateSkipAvailability);
+    updateSkipAvailability();
+
+    return () => {
+      el.removeEventListener("timeupdate", updateSkipAvailability);
+    };
+  }, [displaySrc, skipAfterSeconds]);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -126,7 +164,7 @@ function VideoPlayerInner({
       <video
         ref={videoRef}
         className={`h-full w-full transition-opacity ease-in-out ${videoClassName} ${
-          isVideoVisible ? "opacity-100" : "opacity-0"
+          isVideoVisible && !isSourceSwapping ? "opacity-100" : "opacity-0"
         }`}
         style={{ transitionDuration: `${VIDEO_FADE_DURATION_MS}ms` }}
         src={displaySrc}
@@ -154,14 +192,23 @@ function VideoPlayerInner({
           </div>
         </div>
       ) : null}
+
+      {!loop && isReady && !hasError && canSkip ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-end p-4 sm:p-6">
+          <button
+            className={`pointer-events-auto rounded-full border border-white/16 bg-black/56 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/88 backdrop-blur-sm transition hover:border-white/34 hover:bg-black/72 ${skipButtonClassName}`}
+            type="button"
+            onClick={handleSkip}
+          >
+            Skip Cutscene
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export default function VideoPlayer({
-  skipAfterSeconds: _skipAfterSeconds,
-  skipButtonClassName: _skipButtonClassName,
-  onSkip: _onSkip,
   ...props
 }) {
   return <VideoPlayerInner {...props} />;

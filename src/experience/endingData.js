@@ -1,27 +1,20 @@
 export const endingData = Object.freeze({
-  destroyer: {
-    title: "THE DESTROYER",
-    line: "You killed the last miracle.",
-    video: "/videos/endings/destroyer.mp4",
-    product: "nullblade",
+  fight: {
+    title: "FIGHT PATH INCOMING",
+    line: "Drop in the fight clip and the follow-up choices when you are ready.",
+    video: null,
+    product: null,
   },
-  saint: {
-    title: "THE NEW SAINT",
-    line: "You became the god humanity built by mistake.",
-    video: "/videos/endings/saint.mp4",
-    product: "haloframe",
+  "kneel-give-up": {
+    title: "TOTAL SURRENDER",
+    line: "You give up and wait for the product reveal you will provide.",
+    video: null,
+    product: null,
   },
-  heretic: {
-    title: "THE HERETIC",
-    line: "You released what should have stayed buried.",
-    video: "/videos/endings/heretic.mp4",
-    product: "bloodcircuit",
-  },
-  apostle: {
-    title: "THE APOSTLE",
-    line: "You taught the machine mercy.",
-    video: "/videos/endings/apostle.mp4",
-    product: "mercyband",
+  "kneel-sneak-attack": {
+    title: "FALSE DEVOTION",
+    line: "You kneel, then strike, and the path now waits for the product reveal you will provide.",
+    video: null,
+    product: null,
   },
 });
-

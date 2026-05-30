@@ -3,10 +3,8 @@ import { STAGES } from "./stages";
 export const initialExperienceState = Object.freeze({
   currentStage: STAGES.PROLOGUE,
   choices: {
-    route: null,
-    blade: null,
-    sacrifice: null,
-    command: null,
+    approach: null,
+    kneelResponse: null,
   },
   scores: {
     destroyer: 0,
@@ -17,4 +15,3 @@ export const initialExperienceState = Object.freeze({
   ending: null,
   product: null,
 });
-

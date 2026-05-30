@@ -2,7 +2,7 @@ import { decisionData } from "./decisionData";
 import { endingData } from "./endingData";
 import { initialExperienceState } from "./initialState";
 import { productData } from "./productData";
-import { applyScoreDelta, resolveEnding, resolveOpenGates } from "./scoring";
+import { applyScoreDelta } from "./scoring";
 import {
   consequenceStageForKey,
   decisionKeyForStage,
@@ -49,9 +49,6 @@ function reduceSelectChoice(state, payload) {
   if (!option) return state;
 
   let nextScores = applyScoreDelta(state.scores, option.score);
-  if (decisionKey === "command" && optionId === "open-gates") {
-    nextScores = resolveOpenGates(nextScores);
-  }
 
   const nextChoices = { ...state.choices, [decisionKey]: optionId };
   const nextStage = consequenceStageForKey(decisionKey);
@@ -69,23 +66,49 @@ function isChoiceSelectionAllowed(stage, decisionKey) {
 
   switch (stage) {
     case STAGES.PROLOGUE:
-      return decisionKey === "route";
-    case STAGES.CONSEQUENCE_ROUTE:
-      return decisionKey === "blade";
-    case STAGES.CONSEQUENCE_BLADE:
-      return decisionKey === "sacrifice";
-    case STAGES.CONSEQUENCE_SACRIFICE:
-      return decisionKey === "command";
+      return decisionKey === "approach";
+    case STAGES.CONSEQUENCE_APPROACH:
+      return decisionKey === "kneelResponse";
     default:
       return false;
   }
 }
 
+function resolveEndingFromChoices(choices) {
+  if (choices.approach === "fight") {
+    return "fight";
+  }
+
+  if (choices.approach === "kneel" && choices.kneelResponse === "give-up") {
+    return "kneel-give-up";
+  }
+
+  if (choices.approach === "kneel" && choices.kneelResponse === "sneak-attack") {
+    return "kneel-sneak-attack";
+  }
+
+  return null;
+}
+
 function reduceVideoEnded(state) {
   const stage = state.currentStage;
 
-  if (stage === STAGES.CONSEQUENCE_COMMAND) {
-    const endingKey = resolveEnding(state.scores);
+  if (stage === STAGES.CONSEQUENCE_APPROACH && state.choices.approach === "fight") {
+    const endingKey = resolveEndingFromChoices(state.choices);
+    const ending = endingKey ? endingData[endingKey] : null;
+    const productKey = ending?.product ?? null;
+    const product = productKey && productData[productKey] ? productKey : null;
+
+    return {
+      ...state,
+      currentStage: STAGES.ENDING,
+      ending: endingKey,
+      product,
+    };
+  }
+
+  if (stage === STAGES.CONSEQUENCE_KNEEL_RESPONSE) {
+    const endingKey = resolveEndingFromChoices(state.choices);
     const ending = endingData[endingKey];
     const productKey = ending?.product ?? null;
     const product = productKey && productData[productKey] ? productKey : null;
@@ -98,7 +121,7 @@ function reduceVideoEnded(state) {
     };
   }
 
-  const nextStage = nextStageAfterVideo(stage);
+  const nextStage = nextStageAfterVideo(stage, state.choices);
   if (!nextStage) return state;
 
   return { ...state, currentStage: nextStage };
