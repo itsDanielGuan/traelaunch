@@ -131,6 +131,20 @@ function ExperienceInner() {
     };
   }, [clearTransitionTimers]);
 
+  useEffect(() => {
+    const { documentElement, body } = document;
+    const previousHtmlOverflow = documentElement.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+
+    documentElement.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    return () => {
+      documentElement.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+    };
+  }, []);
+
   const overlayDecision = decisionOverlayKey ? decisionData[decisionOverlayKey] : null;
 
   const activeConsequenceKey = useMemo(() => {
@@ -293,7 +307,7 @@ function ExperienceInner() {
   }, [showSkipControl]);
 
   return (
-    <div className="sc-screen relative flex min-h-screen w-full items-stretch justify-stretch bg-black text-white">
+    <div className="sc-screen relative flex h-screen min-h-screen w-full overflow-hidden bg-black text-white">
       {showVideo ? (
         <div className="absolute inset-0">
           <VideoPlayer
@@ -347,8 +361,8 @@ function ExperienceInner() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(77,186,210,0.14),transparent_24%),radial-gradient(circle_at_20%_60%,rgba(198,23,47,0.16),transparent_28%),linear-gradient(180deg,#071019_0%,#06080c_48%,#030406_100%)]" />
       )}
 
-      <div className="relative z-10 flex w-full flex-col">
-        <header className="flex items-start px-5 py-5 sm:px-8">
+      <div className="relative z-10 flex min-h-0 w-full flex-col overflow-hidden">
+        <header className="shrink-0 flex items-start px-5 py-5 sm:px-8">
           <div className="sc-video-hud px-4 py-3">
             <div className="sc-kicker text-[10px]">Saint Circuit</div>
             <div className="mt-1 sc-title text-xs font-semibold">{stageLabel}</div>
@@ -362,7 +376,7 @@ function ExperienceInner() {
           ) : null}
         </header>
 
-        <div className="relative flex flex-1 px-5 pb-8 pt-4 sm:px-8 sm:pb-10">
+        <div className="relative flex min-h-0 flex-1 px-5 pb-8 pt-4 sm:px-8 sm:pb-10">
           {overlayDecision ? (
             <div className="mt-auto flex w-full justify-center">
               <div className="w-full max-w-5xl transition-opacity duration-700 ease-out opacity-100">
