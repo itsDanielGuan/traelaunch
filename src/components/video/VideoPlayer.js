@@ -194,7 +194,7 @@ function VideoPlayerInner({
       ) : null}
 
       {!loop && isReady && !hasError && canSkip ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-end p-4 sm:p-6">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-end p-4 sm:p-6">
           <button
             className={`pointer-events-auto rounded-full border border-white/16 bg-black/56 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/88 backdrop-blur-sm transition hover:border-white/34 hover:bg-black/72 ${skipButtonClassName}`}
             type="button"

@@ -42,9 +42,11 @@ function getStageLabel(stage) {
     case STAGES.DECISION_APPROACH:
       return "Decision I";
     case STAGES.DECISION_KNEEL_RESPONSE:
+    case STAGES.DECISION_FIGHT_STYLE:
       return "Decision II";
     case STAGES.CONSEQUENCE_APPROACH:
     case STAGES.CONSEQUENCE_KNEEL_RESPONSE:
+    case STAGES.CONSEQUENCE_FIGHT_STYLE:
       return "Consequence";
     case STAGES.ENDING:
       return "Ending";
@@ -127,7 +129,7 @@ function ExperienceInner() {
   }, [state.currentStage]);
 
   const pathSummary = useMemo(() => {
-    const summaryOrder = ["approach", "kneelResponse"];
+    const summaryOrder = ["approach", "kneelResponse", "fightStyle"];
 
     return summaryOrder
       .map((decisionKey) => {
@@ -140,7 +142,12 @@ function ExperienceInner() {
 
         return {
           key: decisionKey,
-          title: decisionKey === "approach" ? "Approach" : "Kneel Choice",
+          title:
+            decisionKey === "approach"
+              ? "Approach"
+              : decisionKey === "kneelResponse"
+                ? "Kneel Choice"
+                : "Fight Style",
           label: option.label,
           description: option.description,
         };
@@ -196,6 +203,10 @@ function ExperienceInner() {
   );
 
   const isEndingReady = endingReady || (state.currentStage === STAGES.ENDING && !videoSrc);
+  const endingTheme = product?.theme ?? {
+    accent: "var(--sc-cyan)",
+    glow: "var(--sc-red)",
+  };
 
   const handleVideoEnded = useCallback(() => {
     if (state.currentStage === STAGES.ENDING) {
@@ -209,7 +220,10 @@ function ExperienceInner() {
       return;
     }
 
-    if (state.currentStage === STAGES.CONSEQUENCE_KNEEL_RESPONSE) {
+    if (
+      state.currentStage === STAGES.CONSEQUENCE_KNEEL_RESPONSE ||
+      state.currentStage === STAGES.CONSEQUENCE_FIGHT_STYLE
+    ) {
       beginBlackTransition("", () => {
         dispatch(actions.videoEnded());
       });
@@ -242,6 +256,9 @@ function ExperienceInner() {
             className="h-full w-full"
             videoClassName="h-full w-full object-cover"
             muted={false}
+            skipAfterSeconds={
+              state.currentStage === STAGES.ENDING ? Number.POSITIVE_INFINITY : 0
+            }
             onLoadStart={() => {
               setProgress({ current: 0, duration: 0 });
               setDecisionOverlayKey(null);
@@ -280,8 +297,8 @@ function ExperienceInner() {
               }));
             }}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.04),transparent_26%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.08)_30%,rgba(0,0,0,0.58)_100%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.04),transparent_26%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.08)_30%,rgba(0,0,0,0.58)_100%)]" />
         </div>
       ) : (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(77,186,210,0.14),transparent_24%),radial-gradient(circle_at_20%_60%,rgba(198,23,47,0.16),transparent_28%),linear-gradient(180deg,#071019_0%,#06080c_48%,#030406_100%)]" />
@@ -355,80 +372,96 @@ function ExperienceInner() {
                   {selectedOption ? selectedOption.label : "..."}
                 </div>
                 <div className="mt-2 text-sm leading-6 text-white/72">
-                  {state.currentStage === STAGES.CONSEQUENCE_APPROACH &&
-                  selectedOption?.id === "fight"
-                    ? "This branch is scaffolded and ready for the fight clip and later choices."
-                    : "The next step appears after the clip finishes."}
+                  The next step appears after the clip finishes.
                 </div>
               </div>
             </div>
           ) : null}
 
           {state.currentStage === STAGES.ENDING && ending ? (
-            <div className="mt-auto flex w-full flex-col gap-4 lg:max-w-5xl">
-              <div className="sc-overlay sc-fade-in max-w-3xl px-6 py-5">
-                <div className="sc-kicker text-[10px] text-white/60">Ending</div>
+            <div className="mt-auto flex w-full flex-col gap-4">
+              <div
+                className="w-full max-w-xl px-2 py-2 sm:px-0"
+                style={{
+                  "--sc-accent": endingTheme.accent,
+                  "--sc-glow": endingTheme.glow,
+                }}
+              >
+                <div className="sc-kicker text-[10px]" style={{ color: "var(--sc-accent)" }}>
+                  Ending Outcome
+                </div>
                 <div className="sc-medieval sc-metal-text mt-3 text-3xl sm:text-4xl">
                   {ending.title}
                 </div>
-                <div className="mt-3 max-w-2xl text-sm leading-6 text-white/74 sm:text-base">
+                <div className="mt-3 text-sm leading-6 text-white/78 sm:text-base">
                   {ending.line}
                 </div>
-              </div>
+                <div className="mt-3 text-sm leading-7 text-white/72">
+                  {ending.scenario ?? ending.line}
+                </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                {pathSummary.map((entry) => (
-                  <div key={entry.key} className="sc-overlay px-4 py-3">
-                    <div className="sc-kicker text-[9px] text-white/52">
-                      {entry.title}
-                    </div>
-                    <div className="mt-2 text-lg font-semibold text-white">
-                      {entry.label}
-                    </div>
-                    <div className="mt-2 text-sm leading-6 text-white/68">
-                      {entry.description}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row">
                 {product ? (
+                  <>
+                    <div className="mt-6 h-px w-full bg-white/12" />
+                    <div className="mt-6 sc-kicker text-[10px]" style={{ color: "var(--sc-accent)" }}>
+                      Product Unlocked
+                    </div>
+                    <div className="mt-3 sc-medieval sc-metal-text text-2xl sm:text-3xl">
+                      {product.name}
+                    </div>
+                    <div className="mt-2 text-sm leading-6 text-white/78">
+                      {product.tagline}
+                    </div>
+                    <div className="mt-4 text-sm leading-7 text-white/72">
+                      {product.description}
+                    </div>
+                  </>
+                ) : null}
+
+                <div className="mt-6 grid gap-3">
+                  {product ? (
+                    <a
+                      className="sc-btn sc-btn-primary text-center"
+                      href={product.buyHref ?? "#buy-now"}
+                    >
+                      Buy now
+                    </a>
+                  ) : null}
                   <button
-                    className="sc-btn sc-btn-primary"
+                    className="sc-btn"
                     type="button"
                     onClick={() => {
                       setEndingReady(false);
-                      dispatch(actions.revealProduct());
+                      setIntroFadeActive(true);
+                      dispatch(actions.reset());
                     }}
-                    disabled={!isEndingReady}
                   >
-                    Reveal Relicware
+                    Replay Pilgrimage
                   </button>
-                ) : null}
-                <button
-                  className="sc-btn"
-                  type="button"
-                  onClick={() => {
-                    setEndingReady(false);
-                    setIntroFadeActive(true);
-                    dispatch(actions.reset());
-                  }}
-                >
-                  Replay Pilgrimage
-                </button>
-              </div>
+                </div>
 
-              {!isEndingReady ? (
-                <div className="text-xs text-white/58">
-                  The ending card will unlock once the current clip finishes.
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {pathSummary.map((entry) => (
+                    <div key={entry.key} className="border-l border-white/12 pl-4">
+                      <div className="sc-kicker text-[9px] text-white/46">
+                        {entry.title}
+                      </div>
+                      <div className="mt-2 text-base font-semibold text-white">
+                        {entry.label}
+                      </div>
+                      <div className="mt-2 text-xs leading-6 text-white/60">
+                        {entry.description}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ) : null}
-              {isEndingReady && !product ? (
-                <div className="text-xs text-white/58">
-                  Product reveal is waiting for the product assets you will provide.
-                </div>
-              ) : null}
+
+                {!isEndingReady ? (
+                  <div className="mt-5 text-xs text-white/54">
+                    The product reveal is still playing and will hold on the final frame.
+                  </div>
+                ) : null}
+              </div>
             </div>
           ) : null}
 

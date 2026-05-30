@@ -11,30 +11,36 @@ export const MEDIA_PATHS = Object.freeze({
       fight: "/video/fight1.mp4",
     },
     kneelResponse: {
-      "give-up": "/videos/decision-2/give-up.mp4",
-      "sneak-attack": "/videos/decision-2/sneak-attack.mp4",
+      "give-up": "/video/giveup.mp4",
+      "sneak-attack": "/video/sneakattack.mp4",
+    },
+    fightStyle: {
+      aggressive: "/video/aggressive.mp4",
+      defensive: "/video/parry.mp4",
     },
   },
   endings: {
     fight: null,
-    "kneel-give-up": null,
-    "kneel-sneak-attack": null,
+    "fight-aggressive": "/video/haloframecontroller.mp4",
+    "fight-defensive": "/video/mercybandheadset.mp4",
+    "kneel-give-up": "/video/bloodcircuitmouse.mp4",
+    "kneel-sneak-attack": "/video/nullbladekeyboard.mp4",
   },
   products: {
     haloframe: {
-      video: "/videos/products/haloframe-controller.mp4",
+      video: "/video/haloframecontroller.mp4",
       image: "/images/products/haloframe-controller.png",
     },
     nullblade: {
-      video: "/videos/products/nullblade-keyboard.mp4",
+      video: "/video/nullbladekeyboard.mp4",
       image: "/images/products/nullblade-keyboard.png",
     },
     bloodcircuit: {
-      video: "/videos/products/bloodcircuit-mouse.mp4",
+      video: "/video/bloodcircuitmouse.mp4",
       image: "/images/products/bloodcircuit-mouse.png",
     },
     mercyband: {
-      video: "/videos/products/mercyband-headset.mp4",
+      video: "/video/mercybandheadset.mp4",
       image: "/images/products/mercyband-headset.png",
     },
   },
@@ -46,6 +52,18 @@ const READY_VIDEO_SOURCES = new Set([
   MEDIA_PATHS.prologue,
   MEDIA_PATHS.decisions.approach.kneel,
   MEDIA_PATHS.decisions.approach.fight,
+  MEDIA_PATHS.decisions.kneelResponse["give-up"],
+  MEDIA_PATHS.decisions.kneelResponse["sneak-attack"],
+  MEDIA_PATHS.decisions.fightStyle.aggressive,
+  MEDIA_PATHS.decisions.fightStyle.defensive,
+  MEDIA_PATHS.endings["fight-aggressive"],
+  MEDIA_PATHS.endings["fight-defensive"],
+  MEDIA_PATHS.endings["kneel-give-up"],
+  MEDIA_PATHS.endings["kneel-sneak-attack"],
+  MEDIA_PATHS.products.haloframe.video,
+  MEDIA_PATHS.products.nullblade.video,
+  MEDIA_PATHS.products.bloodcircuit.video,
+  MEDIA_PATHS.products.mercyband.video,
 ]);
 
 export function resolveVideoSrc(targetPath) {

@@ -5,6 +5,7 @@ export const initialExperienceState = Object.freeze({
   choices: {
     approach: null,
     kneelResponse: null,
+    fightStyle: null,
   },
   scores: {
     destroyer: 0,

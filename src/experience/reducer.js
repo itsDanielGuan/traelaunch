@@ -68,7 +68,7 @@ function isChoiceSelectionAllowed(stage, decisionKey) {
     case STAGES.PROLOGUE:
       return decisionKey === "approach";
     case STAGES.CONSEQUENCE_APPROACH:
-      return decisionKey === "kneelResponse";
+      return decisionKey === "kneelResponse" || decisionKey === "fightStyle";
     default:
       return false;
   }
@@ -76,7 +76,13 @@ function isChoiceSelectionAllowed(stage, decisionKey) {
 
 function resolveEndingFromChoices(choices) {
   if (choices.approach === "fight") {
-    return "fight";
+    if (choices.fightStyle === "aggressive") {
+      return "fight-aggressive";
+    }
+
+    if (choices.fightStyle === "defensive") {
+      return "fight-defensive";
+    }
   }
 
   if (choices.approach === "kneel" && choices.kneelResponse === "give-up") {
@@ -93,7 +99,7 @@ function resolveEndingFromChoices(choices) {
 function reduceVideoEnded(state) {
   const stage = state.currentStage;
 
-  if (stage === STAGES.CONSEQUENCE_APPROACH && state.choices.approach === "fight") {
+  if (stage === STAGES.CONSEQUENCE_FIGHT_STYLE) {
     const endingKey = resolveEndingFromChoices(state.choices);
     const ending = endingKey ? endingData[endingKey] : null;
     const productKey = ending?.product ?? null;
