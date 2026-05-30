@@ -1,0 +1,118 @@
+export const decisionData = Object.freeze({
+  route: {
+    question: "The Archangel has fallen into the cathedral. How do you enter?",
+    options: [
+      {
+        id: "nave",
+        label: "Walk Through the Nave",
+        description: "Face the cathedral directly.",
+        transitionLine: "You enter the cathedral in full view of the machine god.",
+        score: { apostle: 1 },
+        video: "/videos/decision-1/nave.mp4",
+      },
+      {
+        id: "tower",
+        label: "Climb the Bell Tower",
+        description: "Seek power from above.",
+        transitionLine: "You seek judgment from above the broken cathedral.",
+        score: { saint: 1 },
+        video: "/videos/decision-1/tower.mp4",
+      },
+      {
+        id: "crypt",
+        label: "Descend into the Crypt",
+        description: "Enter through forbidden machine catacombs.",
+        transitionLine: "You choose the forbidden path beneath the altar.",
+        score: { heretic: 1 },
+        video: "/videos/decision-1/crypt.mp4",
+      },
+    ],
+  },
+  blade: {
+    question: "Your sword is dead. What do you feed the blade?",
+    options: [
+      {
+        id: "prayer-code",
+        label: "Prayer-Code",
+        description: "Weaponize faith.",
+        transitionLine: "You feed the blade with executable prayer.",
+        score: { apostle: 1 },
+        video: "/videos/decision-2/prayer-code.mp4",
+      },
+      {
+        id: "dead-fire",
+        label: "Dead Fire",
+        description: "Weaponize destruction.",
+        transitionLine: "You awaken the blade with ruin made sacred.",
+        score: { destroyer: 1 },
+        video: "/videos/decision-2/dead-fire.mp4",
+      },
+      {
+        id: "human-memory",
+        label: "Human Memory",
+        description: "Weaponize grief.",
+        transitionLine: "You forge the blade from human grief.",
+        score: { heretic: 1 },
+        video: "/videos/decision-2/human-memory.mp4",
+      },
+    ],
+  },
+  sacrifice: {
+    question: "What should humanity sacrifice for one final miracle?",
+    options: [
+      {
+        id: "fear",
+        label: "Their Fear",
+        description: "Humanity must become fearless.",
+        transitionLine: "You command fear to be burned out of humanity.",
+        score: { saint: 1 },
+        video: "/videos/decision-3/fear.mp4",
+      },
+      {
+        id: "memories",
+        label: "Their Memories",
+        description: "Humanity must forget pain.",
+        transitionLine: "You offer memory itself to the miracle.",
+        score: { apostle: 1 },
+        video: "/videos/decision-3/memories.mp4",
+      },
+      {
+        id: "obedience",
+        label: "Their Obedience",
+        description: "Humanity must stop worshipping machines.",
+        transitionLine: "You choose rebellion over obedience.",
+        score: { destroyer: 1 },
+        video: "/videos/decision-3/obedience.mp4",
+      },
+    ],
+  },
+  command: {
+    question: "The Archangel’s core is exposed. What is your final command?",
+    options: [
+      {
+        id: "sever-core",
+        label: "Sever the Core",
+        description: "Kill the machine god.",
+        transitionLine: "You choose to kill the last miracle.",
+        score: { destroyer: 2 },
+        video: "/videos/decision-4/sever-core.mp4",
+      },
+      {
+        id: "wear-halo",
+        label: "Wear the Halo",
+        description: "Become the machine god.",
+        transitionLine: "You choose to become what the cathedral built.",
+        score: { saint: 2 },
+        video: "/videos/decision-4/wear-halo.mp4",
+      },
+      {
+        id: "open-gates",
+        label: "Open the Gates",
+        description: "Release it into the world.",
+        transitionLine: "You let the cathedral answer the world.",
+        conditional: true,
+        video: "/videos/decision-4/open-gates.mp4",
+      },
+    ],
+  },
+});

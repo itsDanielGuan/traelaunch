@@ -1,0 +1,4 @@
+Old London font
+Designer: Dieter Steffmann
+Source used for this project: https://www.fontrepo.com/font/8736/old-london.ttf
+Attribution note added because the source page describes the font as CC BY 4.0.

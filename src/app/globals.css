@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Old London";
+  src: url("/fonts/OldLondon.ttf") format("truetype");
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #05060a;
+  --foreground: #eef3ff;
+  --sc-red: #c6172f;
+  --sc-red-hot: #ff4c63;
+  --sc-cyan: #4dbad2;
+  --sc-cyan-hot: #a6efff;
+  --sc-gold: #d5bc83;
+  --sc-ink: #090b10;
+  --sc-stone: #11151d;
+  --sc-shadow: rgba(0, 0, 0, 0.62);
+  --sc-panel: color-mix(in oklab, var(--sc-stone) 86%, transparent);
+  --font-old-london: "Old London";
 }
 
 @theme inline {
@@ -14,13 +30,515 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #07060a;
+    --foreground: #f3f0ff;
   }
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1100px 760px at 18% -10%, color-mix(in oklab, var(--sc-cyan) 9%, transparent), transparent 60%),
+    radial-gradient(900px 700px at 90% 14%, color-mix(in oklab, var(--sc-red) 10%, transparent), transparent 56%),
+    radial-gradient(900px 700px at 50% 120%, color-mix(in oklab, var(--sc-gold) 8%, transparent), transparent 62%),
+    linear-gradient(180deg, #071018 0%, #05070a 40%, #040508 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+.sc-screen {
+  position: relative;
+  isolation: isolate;
+}
+
+.sc-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0) 18%,
+      rgba(255, 255, 255, 0) 82%,
+      rgba(255, 255, 255, 0.04) 100%
+    ),
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05), transparent 26%);
+  opacity: 0.38;
+  z-index: 2;
+}
+
+.sc-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.06), transparent 28%),
+    radial-gradient(circle at 16% 58%, color-mix(in oklab, var(--sc-red) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 80% 28%, color-mix(in oklab, var(--sc-cyan) 16%, transparent), transparent 32%),
+    radial-gradient(circle at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.52) 100%);
+  opacity: 0.92;
+  z-index: 1;
+}
+
+@keyframes sc-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.86;
+  }
+  22% {
+    opacity: 1;
+  }
+  71% {
+    opacity: 0.92;
+  }
+  72% {
+    opacity: 1;
+  }
+}
+
+@keyframes sc-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  50% {
+    filter: drop-shadow(0 0 18px color-mix(in oklab, var(--sc-cyan) 16%, transparent));
+  }
+}
+
+.sc-fade-in {
+  animation: sc-fadein 340ms ease-out both;
+}
+
+@keyframes sc-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+.sc-title {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: sc-flicker 6s infinite steps(1, end);
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.08),
+    0 0 24px color-mix(in oklab, var(--sc-cyan) 12%, transparent);
+}
+
+.sc-medieval {
+  font-family: var(--font-old-london), "Times New Roman", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sc-metal-text {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(244, 248, 255, 0.98) 0%,
+      rgba(203, 215, 241, 0.96) 28%,
+      rgba(255, 249, 222, 0.82) 52%,
+      rgba(161, 178, 208, 0.96) 76%,
+      rgba(245, 248, 255, 0.98) 100%
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    0 0 24px rgba(255, 255, 255, 0.14),
+    0 0 38px color-mix(in oklab, var(--sc-cyan) 16%, transparent);
+}
+
+.sc-sigil {
+  position: relative;
+}
+
+.sc-sigil::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  background:
+    conic-gradient(
+      from 210deg,
+      transparent,
+      color-mix(in oklab, var(--sc-cyan) 18%, transparent),
+      transparent,
+      color-mix(in oklab, var(--sc-red) 18%, transparent),
+      transparent
+    );
+  filter: blur(26px);
+  opacity: 0.65;
+  z-index: -1;
+  animation: sc-glow 5.5s ease-in-out infinite;
+}
+
+.sc-panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.09), transparent 30%),
+    linear-gradient(
+      180deg,
+      rgba(24, 30, 39, 0.82) 0%,
+      rgba(10, 13, 18, 0.78) 44%,
+      rgba(7, 9, 13, 0.9) 100%
+    );
+  border: none;
+  box-shadow:
+    0 30px 70px var(--sc-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -20px 40px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(20px) saturate(120%);
+}
+
+.sc-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      140deg,
+      rgba(255, 255, 255, 0.08),
+      transparent 22%,
+      transparent 70%,
+      rgba(77, 186, 210, 0.08) 100%
+    ),
+    radial-gradient(circle at 80% 16%, rgba(255, 76, 99, 0.08), transparent 26%);
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+
+.sc-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 26%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.14), transparent 34%);
+  opacity: 0.9;
+}
+
+.sc-product-panel {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.64),
+    0 0 44px color-mix(in oklab, var(--sc-glow) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.sc-product-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      600px 280px at 20% 0%,
+      color-mix(in oklab, var(--sc-accent) 20%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      700px 320px at 80% 120%,
+      color-mix(in oklab, var(--sc-glow) 18%, transparent),
+      transparent 70%
+    );
+  opacity: 0.9;
+  z-index: -1;
+}
+
+.sc-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  overflow: hidden;
+  padding: 1rem 1.45rem;
+  border: none;
+  border-radius: 18px 22px 16px 24px / 22px 18px 24px 20px;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.14), transparent 24%),
+    linear-gradient(
+      180deg,
+      rgba(37, 44, 54, 0.88) 0%,
+      rgba(15, 18, 24, 0.9) 62%,
+      rgba(8, 10, 14, 0.95) 100%
+    );
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  box-shadow:
+    0 18px 36px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -14px 22px rgba(0, 0, 0, 0.22);
+  transition:
+    transform 120ms ease,
+    filter 160ms ease,
+    box-shadow 160ms ease;
+  backdrop-filter: blur(14px);
+}
+
+.sc-hero-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1.05rem 2.4rem 1.15rem;
+  border: 1px solid rgba(123, 26, 40, 0.74);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(255, 121, 141, 0.18), transparent 38%),
+    linear-gradient(180deg, rgba(109, 18, 33, 0.96), rgba(46, 8, 16, 0.98)),
+    linear-gradient(180deg, rgba(26, 6, 11, 0.48), rgba(10, 2, 5, 0.4));
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(198, 23, 47, 0.14),
+    inset 0 1px 0 rgba(255, 173, 185, 0.2),
+    inset 0 -10px 20px rgba(24, 4, 8, 0.5);
+  transition:
+    transform 160ms ease,
+    box-shadow 200ms ease,
+    filter 200ms ease;
+}
+
+.sc-hero-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 164, 177, 0.16), transparent),
+    linear-gradient(180deg, rgba(255, 215, 221, 0.08), transparent 34%);
+  opacity: 0.72;
+}
+
+.sc-hero-cta::after {
+  content: "";
+  position: absolute;
+  inset: 8px 12px;
+  pointer-events: none;
+  border-top: 1px solid rgba(255, 145, 161, 0.24);
+  border-bottom: 1px solid rgba(44, 8, 16, 0.72);
+  opacity: 0.82;
+}
+
+.sc-hero-cta:hover {
+  transform: translateY(-2px) scale(1.012);
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.56),
+    0 0 38px rgba(198, 23, 47, 0.22),
+    inset 0 1px 0 rgba(255, 182, 192, 0.28),
+    inset 0 -8px 20px rgba(24, 4, 8, 0.52);
+  filter: saturate(1.12);
+}
+
+.sc-hero-cta:active {
+  transform: translateY(0);
+}
+
+.sc-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--sc-cyan) 16%, transparent), transparent 28%);
+  opacity: 0.78;
+}
+
+.sc-btn::after {
+  content: "";
+  position: absolute;
+  inset: auto 16px 8px 16px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  opacity: 0.7;
+}
+
+.sc-btn:hover {
+  transform: translateY(-2px) scale(1.01);
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.28));
+  box-shadow:
+    0 24px 42px rgba(0, 0, 0, 0.48),
+    0 0 30px color-mix(in oklab, var(--sc-cyan) 10%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sc-btn:active {
+  transform: translateY(0px);
+}
+
+.sc-btn:disabled {
+  opacity: 0.45;
+  filter: saturate(0.8);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.sc-btn-primary {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.2), transparent 24%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--sc-cyan) 26%, #26343d) 0%,
+      #0d1319 100%
+    );
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.5),
+    0 0 44px color-mix(in oklab, var(--sc-cyan) 14%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.sc-btn-accent {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--sc-accent) 24%, #2d2322) 0%,
+      #0f1116 100%
+    );
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.5),
+    0 0 40px color-mix(in oklab, var(--sc-accent) 16%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.sc-btn-danger {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.16), transparent 24%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--sc-red) 26%, #33141b) 0%,
+      #120d10 100%
+    );
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.5),
+    0 0 38px color-mix(in oklab, var(--sc-red) 14%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.sc-kicker {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--foreground) 70%, transparent);
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.08);
+}
+
+.sc-mist {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.07), transparent 36%),
+    linear-gradient(180deg, rgba(4, 7, 10, 0.04), rgba(4, 7, 10, 0.5));
+  backdrop-filter: blur(12px);
+}
+
+.sc-overlay {
+  position: relative;
+  overflow: hidden;
+  border-radius: 26px 20px 30px 18px / 18px 26px 18px 30px;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(10, 14, 18, 0.76), rgba(5, 8, 11, 0.58));
+  box-shadow:
+    0 22px 48px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px) saturate(110%);
+}
+
+.sc-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.08), transparent 22%),
+    radial-gradient(circle at 82% 14%, color-mix(in oklab, var(--sc-red) 12%, transparent), transparent 26%);
+  opacity: 0.74;
+}
+
+.sc-page-shell {
+  position: relative;
+}
+
+.sc-page-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.07), transparent 24%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.22));
+  opacity: 0.7;
+}
+
+.sc-link-fade {
+  transition: color 160ms ease, opacity 160ms ease, text-shadow 160ms ease;
+}
+
+.sc-link-fade:hover {
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 0 16px color-mix(in oklab, var(--sc-cyan) 18%, transparent);
+}
+
+.sc-video-hud {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(18, 24, 31, 0.74), rgba(6, 8, 11, 0.72));
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.sc-video-hud::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%);
+}
+
+.sc-progress {
+  position: relative;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(8, 11, 16, 0.6);
+  box-shadow:
+    inset 0 1px 4px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.sc-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, var(--sc-red) 0%, var(--sc-gold) 50%, var(--sc-cyan) 100%);
+  box-shadow:
+    0 0 18px color-mix(in oklab, var(--sc-cyan) 24%, transparent),
+    0 0 12px color-mix(in oklab, var(--sc-red) 16%, transparent);
 }
